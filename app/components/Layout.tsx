@@ -1,48 +1,66 @@
-import AppBar from "@mui/material/AppBar";
+import styled from "@emotion/styled";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
 import { NavLink, Outlet } from "react-router";
 
 const navItems = [
-  { label: "Home", to: "/", end: true },
-  { label: "Dashboard", to: "/dashboard" },
+  { label: "Apps Discovery", to: "/", end: true },
+  { label: "Apps Inventory", to: "/inventory" },
+  { label: "Settings", to: "/settings" },
 ];
+
+const Root = styled(Box)`
+  display: flex;
+  gap: 16px;
+  flex-direction: row;
+  min-height: 100vh;
+  background-color: #2e2e2e;
+`;
+
+const Section = styled(Box)`
+  display: flex;
+  padding: 16px;
+  flex-direction: column;
+  background-color: #393939;
+`;
+
+const NavButton = styled(NavLink)`
+  color: #ffffff;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-left: 2px solid transparent;
+
+  &.active {
+    border-left: 2px solid #b5e600;
+  }
+`;
+
+const AppLogo = styled.img`
+  height: 48px;
+`;
 
 export function Layout() {
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <AppBar position="static" color="default" elevation={1}>
-        <Toolbar>
-          <Stack direction="row" spacing={1} sx={{ flexGrow: 1 }}>
-            {navItems.map((item) => (
-              <Button
-                key={item.to}
-                component={NavLink}
-                to={item.to}
-                end={item.end}
-                color="inherit"
-                sx={{
-                  "&.active": {
-                    fontWeight: 700,
-                    bgcolor: "action.selected",
-                  },
-                }}
-              >
-                {item.label}
-              </Button>
-            ))}
-          </Stack>
-          <Typography variant="h6" component="div">
-            Reco
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Box component="main" sx={{ flex: 1, p: 3 }}>
+    <Root>
+      <Section style={{ gap: 16 }}>
+        <AppLogo src="/logo.svg" alt="App Logo" />
+        <Stack direction="column" spacing={1}>
+          {navItems.map((item) => (
+            <NavButton
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              color="inherit"
+            >
+              {item.label}
+            </NavButton>
+          ))}
+        </Stack>
+      </Section>
+
+      <Section sx={{ flexGrow: 1 }}>
         <Outlet />
-      </Box>
-    </Box>
+      </Section>
+    </Root>
   );
 }
