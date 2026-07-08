@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import {
   Box,
   Paper,
@@ -17,25 +17,27 @@ import { useCompanies } from "../hooks/useCompanies";
 import { useQueryFilters } from "../hooks/useQueryFilters";
 
 export function CompaniesTable() {
-  const { queryFilterParams, setPage, setRowsPerPage } = useQueryFilters();
-  const { data, loading, error, refetch } = useCompanies(queryFilterParams);
+  const { queryFilterParams, setPage, setRowsPerPage, setMultipleValues } =
+    useQueryFilters();
+  const { data, loading, error, refetch } = useCompanies();
 
   const handlePageChange = useCallback(
     (_: unknown, newPage: number) => {
-      refetch({ pageNumber: newPage, pageSize: queryFilterParams.pageSize });
       setPage(newPage.toString());
     },
-    [setPage, refetch],
+    [setPage],
   );
 
   const handleRowsPerPageChange = useCallback(
-    (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-      setPage("0");
-      setRowsPerPage(event.target.value);
-      refetch({ pageNumber: 0, pageSize: parseInt(event.target.value, 10) });
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setMultipleValues({ rowsPerPage: event.target.value, page: "0" });
     },
-    [setPage, setRowsPerPage, refetch],
+    [setPage, setRowsPerPage],
   );
+
+  useEffect(() => {
+    refetch(queryFilterParams);
+  }, [queryFilterParams, refetch]);
 
   if (loading) {
     return (
@@ -76,7 +78,7 @@ export function CompaniesTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data?.appRows.map((company) => (
+            {data.appRows.map((company) => (
               <TableRow key={company.appId}>
                 <TableCell>{company.appId}</TableCell>
                 <TableCell>{company.appName}</TableCell>
@@ -86,16 +88,16 @@ export function CompaniesTable() {
             ))}
           </TableBody>
         </Table>
+        <TablePagination
+          rowsPerPageOptions={[25, 50]}
+          component="div"
+          count={data.totalCount}
+          rowsPerPage={queryFilterParams.pageSize}
+          page={queryFilterParams.pageNumber}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+        />
       </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[25, 50]}
-        component="div"
-        count={data.totalCount}
-        rowsPerPage={queryFilterParams.pageSize}
-        page={queryFilterParams.pageNumber}
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handleRowsPerPageChange}
-      />
     </Box>
   );
 }

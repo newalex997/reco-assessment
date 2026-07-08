@@ -20,5 +20,22 @@ export function useQueryParam<T extends string>(key: string) {
     );
   };
 
-  return [value, setValue] as const;
+  const setMultipleValues = (newValues: Record<string, string>) => {
+    setSearchParams(
+      (prevParams) => {
+        Object.entries(newValues).forEach(([key, value]) => {
+          if (value === "") {
+            prevParams.delete(key);
+          } else {
+            prevParams.set(key, value.toString());
+          }
+        });
+
+        return prevParams;
+      },
+      { replace: true },
+    );
+  };
+
+  return [value, setValue, setMultipleValues] as const;
 }
