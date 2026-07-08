@@ -14,30 +14,27 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useCompanies } from "../hooks/useCompanies";
-import { usePagination } from "../hooks/usePagination";
+import { useQueryFilters } from "../hooks/useQueryFilters";
 
 export function CompaniesTable() {
-  const { data, loading, error, refetch } = useCompanies();
-  const { page, rowsPerPage, onChangePage, onChangeRowsPerPage } =
-    usePagination(25);
+  const { queryFilterParams, setPage, setRowsPerPage } = useQueryFilters();
+  const { data, loading, error, refetch } = useCompanies(queryFilterParams);
 
   const handlePageChange = useCallback(
     (_: unknown, newPage: number) => {
-      onChangePage(newPage);
-
-      refetch({ pageNumber: newPage, pageSize: rowsPerPage });
+      refetch({ pageNumber: newPage, pageSize: queryFilterParams.pageSize });
+      setPage(newPage.toString());
     },
-    [onChangePage, refetch],
+    [setPage, refetch],
   );
 
   const handleRowsPerPageChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-      onChangeRowsPerPage(parseInt(event.target.value, 10));
-      onChangePage(0);
-
+      setPage("0");
+      setRowsPerPage(event.target.value);
       refetch({ pageNumber: 0, pageSize: parseInt(event.target.value, 10) });
     },
-    [onChangePage, onChangeRowsPerPage, refetch],
+    [setPage, setRowsPerPage, refetch],
   );
 
   if (loading) {
@@ -52,7 +49,11 @@ export function CompaniesTable() {
     return (
       <Box sx={{ color: "error.main", flex: 1 }}>
         <Typography>Error: {error}</Typography>
-        <Button variant="contained" color="primary" onClick={() => refetch()}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => refetch(queryFilterParams)}
+        >
           Retry
         </Button>
       </Box>
@@ -90,8 +91,8 @@ export function CompaniesTable() {
         rowsPerPageOptions={[25, 50]}
         component="div"
         count={data.totalCount}
-        rowsPerPage={rowsPerPage}
-        page={page}
+        rowsPerPage={queryFilterParams.pageSize}
+        page={queryFilterParams.pageNumber}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleRowsPerPageChange}
       />
