@@ -19,9 +19,7 @@ const Root = styled(Box)`
 
 const Section = styled(Box)`
   display: flex;
-  padding: 16px;
   flex-direction: column;
-  background-color: #393939;
 `;
 
 const NavButton = styled(NavLink)`
@@ -35,15 +33,24 @@ const NavButton = styled(NavLink)`
   }
 `;
 
+const SidebarNav = styled(Box)`
+  display: flex;
+  padding: 16px;
+  background-color: #393939;
+  flex-direction: column;
+`;
+
 const AppLogo = styled.img`
   height: 48px;
+  margin-bottom: 32px;
 `;
 
 export function Layout() {
   return (
     <Root>
-      <Section style={{ gap: 16 }}>
+      <SidebarNav>
         <AppLogo src="/logo.svg" alt="App Logo" />
+
         <Stack direction="column" spacing={1}>
           {navItems.map((item) => (
             <NavButton
@@ -56,7 +63,7 @@ export function Layout() {
             </NavButton>
           ))}
         </Stack>
-      </Section>
+      </SidebarNav>
 
       <Section sx={{ flexGrow: 1 }}>
         <Outlet />
